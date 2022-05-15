@@ -1,7 +1,7 @@
 
 Hash.mjs - a safe hash table (table size should only affect performance)
 
-fsutils.mjs - with FSManager
+fsutils.mjs - with directory traversal utilities, FSManager - for file management and cachine
 
 ExtToMime.mjs - for giving the right Mime types for some file extensions
 
