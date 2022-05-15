@@ -15,7 +15,8 @@ Module.mjs - offers a system for multiplexing a console over various independent
 		-messages get wrapped, and start with an identifier for the module of the log/error
 
 Ex.
-'''
+
+'''js
 import Module, {mod0} from "./NodeUtils/Module.mjs"
 import AsyncInterpreter from "./NodeUtils/cmdline.mjs"
 
@@ -38,6 +39,7 @@ interp.Define("debug", () => {
    m.Log(m.Handler().cwidthper);
 });
 '''
+
 Here mod0 is constructed in Module.mjs, and is used for logging errors in our system
 This simple application defines a module for user-input induced logs, including
 	a debug function (printing an item in our static internal ModuleHandler)
