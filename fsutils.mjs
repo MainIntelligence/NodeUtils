@@ -36,7 +36,7 @@ export default class FSManager {
       SubFileProcess(this.root, ((f) => this.AddFile(f)))
    }
    Contents( f ) { return this.filehash.Value(f); }
-   DoContentProc(file, proc) {
+   DoContentProc(f, proc) {
       fs.readFile(this.root + f).then(contents => {
          proc(f, contents);
       })
@@ -44,9 +44,9 @@ export default class FSManager {
          mod0.LogErr("FSManager - Cannot load "+ f + " " + err);
       })
    }
-   AddFile(f) { DoContentProc(f, ((f,c) => this.filehash.Add(f,c))) }
+   AddFile(f) { this.DoContentProc(f, ((f,c) => this.filehash.Add(f,c))) }
    RemoveFile(f) { this.filehash.Remove(f) }
-   RefreshFile( f ) { DoContentProc(f, ((f,c) => this.filehash.Modify(f,c))) }
+   RefreshFile( f ) { this.DoContentProc(f, ((f,c) => this.filehash.Modify(f,c))) }
    
    Refresh(subdir = '') {
       SubFileProcess(this.root + subdir, ((f) => this.RefreshFile(f)))

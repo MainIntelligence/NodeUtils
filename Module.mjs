@@ -1,5 +1,7 @@
 
 import fs from "fs";
+import TextFX, {fxcommon} from "./ANSI.mjs"
+
 //mh is static interfaced only by Modules, mod0 gives a module for internals of the system
 
 //Module utilities
@@ -10,10 +12,6 @@ function TextReduce(args) {
 function Div(x, d) {
    return Math.trunc(x / d);
 }
-function Red(text) {
-   return "\x1B[31m" + text + "\x1B[0m";
-}
-function Ident(x) { return x; }
 
 
 //ModuleHandler: has an array with 
@@ -50,20 +48,26 @@ class ModuleHandler {
   /*Used to have a CarefullyClear method on columnID (fill with whitespace),
   	much easier to just clear everything and reprint the screen w/this.Fix*/
 
-  RWriteFX(c, linec, text, textfx) {
+  RWrite(c, linec, fxtestpair) {
+     let applyfx = ((text) => (fxtestpair[0]).Apply(text));
+     let text = fxtestpair[1];
      const div = Div(text.length - 1, this.cwidthper);
-     process.stdout.write(this.Go(linec++,c) + textfx(text.slice(this.cwidthper * div)));
+     
+     process.stdout.write(this.Go(linec++,c) + 
+     			applyfx( text.slice(this.cwidthper * div) ));
      for (let j = 0; j < div && linec < this.OutputLineEnd(); j++) {
        process.stdout.write( this.Go(linec++,c) + 
-       	  textfx(text.slice( this.cwidthper * (div - j - 1), this.cwidthper * (div - j) )));
+          applyfx(text.slice( this.cwidthper * (div - j - 1),
+          		      this.cwidthper * (div - j) ) )
+       );
      }
      return linec;
   }
-  RWrite(c, linec, text) {
+  /*RWrite(c, linec, text) {
      return this.RWriteFX(c, linec, text, (c==0) ? Red : Ident);
-  }
-  Add(text, c) {
-     this.msgstack[c].push(text);
+  }*/
+  Add(text, c, FX) {
+     this.msgstack[c].push([FX, text]);
      this.Fix();
   }
   Fix() {
@@ -80,14 +84,24 @@ class ModuleHandler {
   }
   Log(modi, ...args) {
      const text = '(' + modi + ') ' + TextReduce(args);
-     this.Add(text,1);
+     this.Add(text,1, new TextFX());
   }
   LogErr(modi, ...args) {
      const text = '(' + modi + ') ' + TextReduce(args);
      
      fs.appendFile("errlog", text + '\n', 'utf8',
-     	(err) => { if (err) { this.Add(err, 0) } });
-     this.Add(text, 0);
+     	(err) => { if (err) { this.Add(err, 0, fxcommon.red) } });
+     this.Add(text, 0, fxcommon.red);
+  }
+  LogFX(modi, FX, ...args) {
+     const text = '(' + modi + ') ' + TextReduce(args);
+     this.Add(text, 1, FX);
+  }
+  LogErrFX(modi, FX, ...args) {
+     const text = '(' + modi + ') ' + TextReduce(args);
+     fs.appendFile("errlog", text + '\n', 'utf8',
+     	(err) => { if (err) { this.Add(err, 0, fxcommon.red) } });
+     this.Add(text, 0, FX);
   }
 };
 
@@ -98,12 +112,11 @@ export default class Module {
      this.moduleID = mh.NewModuleID();
   }
   Handler() { return mh; }//for debug purposes
-  LogErr(...args) {
-     mh.LogErr(this.moduleID, ...args);
-  }
-  Log(...args) {
-     mh.Log(this.moduleID, ...args);
-  }
+  LogErr(...args) { mh.LogErr(this.moduleID, ...args); }
+  Log(...args) { mh.Log(this.moduleID, ...args); }
+  LogErrFX(...args) { mh.LogErrFX(this.moduleID, ...args); }
+  LogFX(...args) { mh.LogFX(this.moduleID, ...args); }
+  
 }
 export let mod0 = new Module();
 
