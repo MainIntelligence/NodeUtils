@@ -6,7 +6,7 @@ that knows to give you MIChat.mjs (you may need to fiddle with the path dependin
 <!DOCTYPE html>
 <html>
 
-<head><link rel="stylesheet" href="../../main.css">
+<head><link rel="stylesheet" href="main.css">
 <link rel="stylesheet" href="resizer.css">
 <title>Panel</title>
 </head>
