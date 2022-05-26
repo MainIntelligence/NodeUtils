@@ -104,7 +104,7 @@ class ControlModule extends IOContainer {
      for (let item of subtitles) {
        let card = gen.CSSDiv("display:flex; flex-direction:column; width:40%; overflow:hidden; border: solid green 1px");
        let title = TitleTag(item, "position:relative");
-       let dlg = gen.CSSDiv("overflow-y:auto; flex:auto; ");
+       let dlg = gen.CSSDiv("overflow-y:auto; word-wrap: break-word;");
        
        gen.AppendChildren(card, title, dlg);
        gen.AppendChildren(cards, card);
