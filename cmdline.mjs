@@ -16,6 +16,15 @@ export default class {
       }
       this.funchash.Add(name, func);
    }
+   Do(cmd) {
+     mod0.Log("Here");
+     const ents = cmd.split(" ").filter( str => (str.length != 0) );
+     if (ents.length == 0) { return; }
+     
+     let func = this.funchash.Value(ents[0]);
+     if (func == null) { mod0.LogErr("command unrecognized"); return; }
+     func(ents.slice(1));
+   }
    Execute( ) {
       process.stdin.on("readable", () => {
          let input = "";
@@ -23,13 +32,7 @@ export default class {
          while((chunk = process.stdin.read()) !== null) {
             input += chunk;
          }
-         input = input.slice(0, input.length - 1); //slice off newline
-         const ents = input.split(" ").filter( str => (str.length != 0) );
-         if (ents.length == 0) { return; }
-         
-         let func = this.funchash.Value(ents[0]);
-         if (func == null) { mod0.LogErr("command unrecognized"); return; }
-         func(ents.slice(1));
+         Do(input.slice(0, input.length - 1));
       })
    }
    //Just here so that you can set your own callback to detect when input is sent

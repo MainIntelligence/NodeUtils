@@ -108,5 +108,6 @@ export const fxcommon = {
    uberyellow:  new TextFX(fx.Uber, fx.Yellow),
    uberred: 	new TextFX(fx.Uber, fx.Red),
    blinkred: 	new TextFX(fx.Blink, fx.Red),
-   blinkuberred:new TextFX(fx.Blink, fx.Uber, fx.Red)
+   blinkuberred:new TextFX(fx.Blink, fx.Uber, fx.Red),
+   blinkubergreen: new TextFX(fx.Blink, fx.Uber, fx.Green)
 }
