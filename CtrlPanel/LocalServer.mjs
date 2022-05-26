@@ -1,19 +1,19 @@
 
 import ExtMimeHash from "./../ExtToMime.mjs"
-import {mod0} from "./../Module.mjs"
+import Module, {mod0} from "./../Module.mjs"
 import http from "http";
 import fs from "fs";
 
 function GetContents(f) { return fs.readFileSync(f, {encoding:"utf8"}); }
 const mimeh = new ExtMimeHash(32);
 
-export default class LocalServer {
+export default class LocalServer extends Module {
    constructor(dnehandler) {
       const requesthandler = (req, rsp) => {
         //This server gives access to anything on the system with read access
         // so best check that only the user with the read access can use the server
         if (req.socket.remoteAddress != "::ffff:127.0.0.1") {
-          mod0.Log("DENIED", req.url, "to", req.socket.remoteAddress);
+          this.Log("DENIED", req.url, "to", req.socket.remoteAddress);
           rsp.writeHead(403);
           rsp.end("Do you like apples?");
           return;
@@ -31,12 +31,14 @@ export default class LocalServer {
           rsp.end(v);
         }
       }
-      this.srv = http.createServer(requesthandler).listen(12345);
+      this.srv = http.createServer(requesthandler).listen(12345, () => {
+         mod0.Log("Local server running on port 12345");
+      });
    }
 };
 
 const srv = new LocalServer(rsp => {
-  console.log("oop");
+  mod0.Log("Bad resource request");
   rsp.writeHead(400);
   rsp.end("No such resource");
 });

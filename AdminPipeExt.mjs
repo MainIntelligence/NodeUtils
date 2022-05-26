@@ -4,7 +4,7 @@
 
 import WebSocketExt from "./WebSocketExt.mjs";
 import Hash from "./Hash.mjs";
-
+import {mod0} from "./Module.mjs";
 let cliHash = new Hash(10);
 
 let admin;
@@ -58,11 +58,10 @@ const SetAdmin = (req) => {
     if (msg.type == "utf8") {
       let str = msg.utf8Data;
       let ib = str.indexOf(',');
-      let vs = [ str.split(0, ib), str.split(ib + 1) ];
-    
+      let vs = [ str.slice(0, ib), str.slice(ib + 1) ];
       if (Number(vs[0]) == 0) { //writing to stdin? server commands?
          if (!adminInputHandler) { return; }
-         adminInputHandler(msg);
+         adminInputHandler(vs[1]);
       }else if (vs[0] >= 3) {
          cliHash.Value(vs[0]).sendUTF(vs[1]);
       }

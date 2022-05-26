@@ -17,12 +17,12 @@ export default class {
       this.funchash.Add(name, func);
    }
    Do(cmd) {
-     mod0.Log("Here");
+     mod0.Log(cmd);
      const ents = cmd.split(" ").filter( str => (str.length != 0) );
      if (ents.length == 0) { return; }
      
      let func = this.funchash.Value(ents[0]);
-     if (func == null) { mod0.LogErr("command unrecognized"); return; }
+     if (func == null) { mod0.LogErr("command", ents[0], "unrecognized"); return; }
      func(ents.slice(1));
    }
    Execute( ) {

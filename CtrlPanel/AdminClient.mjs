@@ -131,7 +131,7 @@ class ControlModule extends IOContainer {
 
 function Record(dlg, text, lr, width = "96%", cssextra) {
   let elm = gen.CSSDiv('display:inline-block;margin:0;float:' + lr + ';width:' + width + ';' + cssextra);
-  elm.className = "Box";
+  //elm.className = "Box";
   elm.innerHTML = text;
   dlg.appendChild(elm);
 }
