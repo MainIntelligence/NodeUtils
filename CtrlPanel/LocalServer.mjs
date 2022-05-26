@@ -1,5 +1,6 @@
 
 import ExtMimeHash from "./../ExtToMime.mjs"
+import {mod0} from "./../Module.mjs"
 import http from "http";
 import fs from "fs";
 
@@ -12,9 +13,9 @@ export default class LocalServer {
         //This server gives access to anything on the system with read access
         // so best check that only the user with the read access can use the server
         if (req.socket.remoteAddress != "::ffff:127.0.0.1") {
-          console.log("DENIED", req.url, "to", req.socket.remoteAddress);
+          mod0.Log("DENIED", req.url, "to", req.socket.remoteAddress);
           rsp.writeHead(403);
-          rsp.end("You tryna hack me bro? :'(");
+          rsp.end("Do you like apples?");
           return;
         }
         
