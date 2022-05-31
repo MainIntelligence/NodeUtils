@@ -80,7 +80,7 @@ class ChatFormat extends IOContainer {
   AttachSender(cli, key) {
      this.send.onclick = () => {
         if (!this.input.value) { return; }
-        cli.Send([key, this.input.value]);
+        cli.Send(this.input.value, [key]);
         Record(this.dlg, this.input.value, 'right');
         this.input.value = "";
         this.dlg.scrollTop = this.dlg.scrollHeight;
@@ -119,35 +119,45 @@ class ControlModule extends IOContainer {
      let dynext = new DynamicExtension(this.cont, this.title);
   }
   
-  AttachSender(cli, hash) {
+  AttachSender(sender, hash) {
      let dlg = hash.Value(1);
-     this.send.onclick = () => {
+     this.send.onclick = (() => {
         if (!this.input.value) { return; }
-        cli.Send([0, this.input.value]);
+        sender.Send(this.input.value, [0]);
         Record(dlg, this.input.value, 'right');
         this.input.value = "";
         dlg.scrollTop = dlg.scrollHeight;
-     }
+     });
   }
 };
 
-function Record(dlg, text, lr, width = "96%", cssextra) {
+//Pass a callback to arbitrarily customize the div before appending
+function RecordModifier(dlg, cb, lr, width = "96%", cssextra = "") {
   let elm = gen.CSSDiv('display:inline-block;margin:0;float:' + lr + ';width:' + width + ';' + cssextra);
   //elm.className = "Box";
-  elm.innerHTML = text;
+  cb(elm);
   dlg.appendChild(elm);
 }
 
+function Record(dlg, text, lr, width = "96%", cssextra) {
+  RecordModifier(dlg, (e => { e.innerHTML = text; }), lr, width, cssextra);
+}
+
+import Decorate from "./../Generator/ANSIMock.mjs";
+import {AdminTransceiver} from "./AdminProtocol.mjs";
 export default class AdminClient {
   constructor(scheme, host, port){
-    let cli = new WSClient(scheme, host, port);
-    cli.Open();
-    this.hash = new Hash(16);
+    let wscli = new WSClient(scheme, host, port);
+    wscli.Open();
     
+    let trans = AdminTransceiver(wscli);
+    
+    this.hash = new Hash(16);
     
     let div = gen.Div();
     let control = new ControlModule(div, "Control", this.hash, "Logs", "Info", "Errors");
-    control.AttachSender(cli, this.hash);
+    control.AttachSender(trans, this.hash);
+    
     document.body.appendChild(div);
     
     let MakeChat = (id, title) => {
@@ -159,11 +169,32 @@ export default class AdminClient {
     }
     let MakeDialog = (id, title) => {
        let cont = MakeChat(id, title);
-       cont.AttachSender(cli, id);
+       cont.AttachSender(trans, id);
     }
     
-    cli.OnRecv(event => {
-      let sep = event.data.indexOf(',');
+    wscli.OnRecv(event => {
+      let str = trans.Str(event.data);
+      let codes = trans.Codes(event.data, 0);
+      
+      let modid = codes[0];
+      let fxid = codes[1];
+      
+      if (this.hash.Value(modid) == null) {
+        MakeDialog(modid, str); }
+      else {
+        let dlg = this.hash.Value(modid);
+        let html = Decorate(str, fxid);
+        RecordModifier(dlg, (e => {
+          e.innerHTML = html.inner;
+          if (html.toblink) {
+            setInterval(() => {
+             e.style.visibility = (e.style.visibility == 'hidden' ? '' : 'hidden');
+            }, 1000);
+          }
+        }), "left", "96%", html.style);
+        dlg.scrollTop = dlg.scrollHeight;
+      }
+      /*let sep = event.data.indexOf(',');
       let vs = [event.data.slice(0,sep), event.data.slice(sep + 1)];
       
       if (this.hash.Value(Number(vs[0])) == null) {
@@ -172,16 +203,16 @@ export default class AdminClient {
         let dialog = this.hash.Value(Number(vs[0]));
         Record(dialog, vs[1], "left");
         dialog.scrollTop = dialog.scrollHeight;
-      }
+      }*/
       beep();
     });
      
-    cli.OnClosed(event => {
+    wscli.OnClosed(event => {
        Record(this.hash.Value(1), "Connection terminated", "none", "100%", "text-align:center");
     });
     
-    cli.OnError(event => {
-      Record(this.hash.Value(1), "Error: It's likely there's nobody listening for chat requests", "none", "100%", "text-align:center");
+    wscli.OnError(event => {
+      Record(this.hash.Value(2), "Error: It's likely there's nobody listening for chat requests", "none", "100%", "text-align:center");
     });
   }
 

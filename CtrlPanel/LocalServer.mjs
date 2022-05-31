@@ -9,6 +9,7 @@ const mimeh = new ExtMimeHash(32);
 
 export default class LocalServer extends Module {
    constructor(dnehandler) {
+      super();
       const requesthandler = (req, rsp) => {
         //This server gives access to anything on the system with read access
         // so best check that only the user with the read access can use the server
@@ -32,7 +33,7 @@ export default class LocalServer extends Module {
         }
       }
       this.srv = http.createServer(requesthandler).listen(12345, () => {
-         mod0.Log("Local server running on port 12345");
+         this.Log("Local server running on port 12345");
       });
    }
 };

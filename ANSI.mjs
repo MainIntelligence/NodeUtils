@@ -38,9 +38,12 @@ function MakeCode(color, topo = 0, isintense = 0, isbg = 0, toblink = 0) {
    return rv;
 }
 let codearr = [];
+
 function GetCode(c, topo, intensity, bg, blink) {
-   return codearr[c + topo * 8 + intensity * 24 + blink * 48 + bg * 96];
+   return c + topo * 8 + intensity * 24 + blink * 48 + bg * 96;
+   //return codearr[c + topo * 8 + intensity * 24 + blink * 48 + bg * 96];
 }
+
 //256 * 5 bytes == 1280 bytes (not bad, storing them all here helps for big console apps)
 for (let bg = 0; bg < 2; bg++) { //bit 7 (128)
 for (let blink = 0; blink < 2; blink++) {//bit 6 (64)
@@ -53,10 +56,6 @@ for (let c = 0; c < 8; c++) { //bits [0,2]
 }
 }
 }
-/*
-function GetCode(c, topo, intensity, bg, blink) {
-   return codearr[c + topo * 8 + intensity * 32 + blink * 64 + bg * 128];
-}*/
 
 let deffx = () => {
 return {
@@ -93,8 +92,9 @@ export default class TextFX {
       for (const fxmod of fxmods) { fx = fxmod(fx); }
       this.code = GetCode(fx.color, fx.topo, fx.intense, fx.bg, fx.blink);
    }
+   Code() { return this.code; }
    Apply(text) {
-      return this.code + text + "\x1B[0m";
+      return codearr[this.code] + text + "\x1B[0m";
    }
 }
 

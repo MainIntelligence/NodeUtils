@@ -90,19 +90,19 @@ class ModuleHandler {
   }
   LogErr(modi, ...args) {
      const text = '(' + modi + ') ' + TextReduce(args);
-     if (SendError(text)) { return; };
+     if (SendError(text, fxcommon.red)) { return; };
      fs.appendFile("errlog", text + '\n', 'utf8',
      	(err) => { if (err) { this.Add(err, 0, fxcommon.red) } });
      this.Add(text, 0, fxcommon.red);
   }
   LogFX(modi, FX, ...args) {
      const text = '(' + modi + ') ' + TextReduce(args);
-     if (SendLog(text)) { return; };
+     if (SendLog(text,FX)) { return; };
      this.Add(text, 1, FX);
   }
   LogErrFX(modi, FX, ...args) {
      const text = '(' + modi + ') ' + TextReduce(args);
-     if (SendError(text)) { return; };
+     if (SendError(text, FX)) { return; };
      fs.appendFile("errlog", text + '\n', 'utf8',
      	(err) => { if (err) { this.Add(err, 0, fxcommon.red) } });
      this.Add(text, 0, FX);

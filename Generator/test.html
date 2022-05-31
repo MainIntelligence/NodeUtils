@@ -1,0 +1,15 @@
+<html>
+   <head>
+      <title>JavaScript String blink() Method</title>
+   </head>
+    
+   <body>
+      <div id="blinkdiv">yo</div>
+      <script>
+         var t = setInterval(function () {
+           let e = document.getElementById('blinkdiv');
+           e.style.visibility = (e.style.visibility == 'hidden' ? '' : 'hidden');
+         }, 1000);
+      </script>
+   </body>
+</html>

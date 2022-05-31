@@ -8,9 +8,12 @@ constructor(scheme, host, port) {
   this.sock;
 }
 
-Open() { this.sock = new WebSocket(this.scheme + '://' + this.host + ':' + this.port); } 
+Open() { 
+  this.sock = new WebSocket(this.scheme + '://' + this.host + ':' + this.port);
+  this.sock.binaryType = 'arraybuffer';
+} 
 Close() { this.sock.close(); }
-Send(d) { this.sock.send(d); }
+send(d) { this.sock.send(d); }
 //event.data with message
 OnOpen(handler) { this.sock.addEventListener('open', eventhandler); }
 OnRecv(eventhandler) { this.sock.addEventListener('message', eventhandler); }
